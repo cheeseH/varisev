@@ -56,9 +56,9 @@ public:
 		 while(true){
 			 corSock->Recv(buffer,4);
 			 corSock->Send(buffer,4);
-			 char* line = new char[1];
-			 line[0] = '\n';
-			 corSock->Send(line,1);
+//			 char* line = new char[1];
+//			 line[0] = '\n';
+//			 corSock->Send(line,1);
 		 }
 	}
 	AcceptEvent(int fd,int listenType):VarisEvent(fd,listenType),clientaddr(),clilen(){
@@ -90,7 +90,7 @@ int main(){
 	memset(&serveraddr,0,sizeof(serveraddr));
 	serveraddr.sin_family = AF_INET;
 	serveraddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	serveraddr.sin_port=htons(9074);
+	serveraddr.sin_port=htons(9075);
 	if(bind(listenfd,(sockaddr *)&serveraddr, sizeof(serveraddr))<0)
 		perror("bind fault\n");
 	if(listen(listenfd, 20)<0){

@@ -58,14 +58,16 @@ public:
 	void schedule(size_t workerNumber);
 	void runCoroutine(size_t workerNumber);
 	bool doWork(VarisEvent* event);
-
+	void runCorEvent(VarisEvent* event);
 	static void onCoroutineFinished(CoroutineManager*);
 };
 
 class CorEvent:public VarisEvent{
 public:
 	void callback();
-	CorEvent(int fd,int listenType,Coroutine* cor);
+	CorEvent(int fd,int listenType,VarisEvent* parent);
+private:
+	VarisEvent* parent_;
 };
 
 class CorHelper{

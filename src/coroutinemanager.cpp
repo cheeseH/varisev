@@ -6,6 +6,7 @@
  */
 #include "coroutinemanager.h"
 #include "eventmanager.h"
+#include <iostream>
 typedef void (*corfunc)(void);
 Coroutine::Coroutine(size_t id,size_t stackSize):id_(id),stackSize_(stackSize),status_(FREE){
 	stack_ = new char[stackSize_];
@@ -105,11 +106,19 @@ void CoroutineManager::runCoroutine(size_t workerNumber){
 	coroutine->work();
 }
 
+void CoroutineManager::runCorEvent(VarisEvent* event){
+	size_t workerNumber = event->getCoroutine()->getId();
+	Coroutine* coroutine = &(coroutines_[workerNumber]);
+	lastCoroutine_ = curCoroutine_ ;
+	curCoroutine_ = coroutine->getId();
+	event->callback();
+}
+
 bool CoroutineManager::doWork(VarisEvent* event){
 		Coroutine* cor;
 		if((cor = event->getCoroutine())!=NULL &&( event->getListenEventType()&T_COROUTINE)){
 			cor->setStatus(BUSY);
-			runCoroutine(cor->getId());
+			runCorEvent(event);
 			return true;
 		}
 		//no coroutine free
@@ -133,21 +142,23 @@ bool CoroutineManager::doWork(VarisEvent* event){
 
 
 void CorEvent::callback(){
+	std::cout<<"id:"<<cor_->getId()<<std::endl;
+	parent_->setCoroutine(cor_);
 	cor_->work();
 }
 
-CorEvent::CorEvent(int fd,int listenType,Coroutine* cor):VarisEvent(fd,listenType){
-	cor_ = cor;
+CorEvent::CorEvent(int fd,int listenType,VarisEvent* parent):VarisEvent(fd,listenType),parent_(parent){
+	cor_ = parent->getCoroutine();
+	listenEventType_|=T_CONTINUE;
 }
 
 CorHelper::CorHelper(int fd,int listenEventType,VarisEvent* event,EventManager* manager):evManager_(manager),cor_(event->getCoroutine()){
 	listenEventType|= T_COROUTINE;
-	event_ = new CorEvent(fd,listenEventType,event->getCoroutine());
-	event->setCoroutine(NULL);
+	event_ = new CorEvent(fd,listenEventType,event);
+	evManager_->Register(event_,-1);
 }
 
 void CorHelper::yield(){
-	evManager_->Register(event_,-1);
 	cor_->yield();
 }
 

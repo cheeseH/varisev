@@ -38,23 +38,25 @@ CorSocket::~CorSocket(){
 }
 
 int CorSocket::Recv(void* buf,size_t len){
-	CorHelper  helper(sockfd_,T_READ,parent_,evManager_);
+	CorHelper*  helper = new CorHelper(sockfd_,T_READ,parent_,evManager_);
 	size_t received = 0;
 			while(received < len){
-				int ret = recv(sockfd_,buf+received,len,MSG_DONTWAIT);
+				int ret = read(sockfd_,buf+received,len);
 				//客户端关闭了网络链接
 				if(ret == 0){
+					delete helper;
 					return received;
 				}
 				else if(ret == -1){
 					if(errno == EAGAIN || errno == EWOULDBLOCK){
-						helper.yield();
+						helper->yield();
 					}
 					else if(errno == EINTR){
 						continue;
 					}
 					else{
 						error_ = errno;
+						delete helper;
 						return ret;
 					}
 				}
@@ -63,6 +65,7 @@ int CorSocket::Recv(void* buf,size_t len){
 			}
 			//remember to release the event
 			perror("herhe");
+			delete helper;
 			return received;
 }
 
@@ -98,23 +101,25 @@ int CorSocket::InnerSend(void* buf,size_t len){
 }
 
 int CorSocket::Send(void* buf,size_t len){
-	CorHelper helper(sockfd_,T_READ,parent_,evManager_);
+	CorHelper* helper = new CorHelper(sockfd_,T_READ,parent_,evManager_);
 	int sended = 0;
 	while(sended < len){
-		int ret = send(sockfd_,buf+sended,len,MSG_DONTWAIT);
+		int ret = write(sockfd_,buf+sended,len);
 		//客户端关闭了网络链接
 		if(ret == 0){
+			delete helper;
 			return sended;
 		}
 		else if(ret == -1){
 			if(errno == EAGAIN || errno == EWOULDBLOCK){
-				helper.yield();
+				helper->yield();
 			}
 			else if(errno == EINTR){
 				continue;
 			}
 			else{
 				error_ = errno;
+				delete helper;
 				return ret;
 			}
 		}
@@ -122,6 +127,7 @@ int CorSocket::Send(void* buf,size_t len){
 			sended+=ret;
 	}
 	//remember to release the event
+	delete helper;
 	return sended;
 }
 
