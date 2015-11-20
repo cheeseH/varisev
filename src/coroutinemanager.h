@@ -65,14 +65,16 @@ public:
 class CorEvent:public VarisEvent{
 public:
 	void callback();
-	CorEvent(int fd,int listenType,VarisEvent* parent);
+	CorEvent(int fd,int listenType,VarisEvent* parent,int multi);
 private:
 	VarisEvent* parent_;
+	int multi_;
 };
+
 
 class CorHelper{
 public:
-	CorHelper(int fd,int listenType,VarisEvent* event,EventManager* manager);
+	CorHelper(int fd,int listenType,VarisEvent* event,EventManager* manager,int multi = 0);
 	~CorHelper();
 	void yield();
 private:

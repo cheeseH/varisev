@@ -32,6 +32,7 @@ void EventManager::Register(VarisEvent* event,long ltime){
 	int eventType = event->getListenEventType();
 	event->setState(ACTIVE);
 	event->setManager(this);
+	event->setPool(pool_);
 	if(eventnum < 0 && !(eventType&T_TIME)){
 		//错误处理
 		assert(0);
@@ -197,6 +198,8 @@ void EventManager::Start(){
 	}
 }
 
-
+void EventManager::setPool(WorkerPool* pool){
+	pool_ = pool;
+}
 
 

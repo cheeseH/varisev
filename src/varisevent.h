@@ -16,7 +16,7 @@ protected:
 	int descriptor_;
 	int listenEventType_;
 	EventManager* eventManager_;
-	//WorkerPool* pool_;
+	WorkerPool* pool_;
 	//表示事件发生时触发他的事件类型
 	int onEventType_;
 
@@ -38,13 +38,15 @@ public:
 	void setListenEventType(int listenEventType);
 	void setCoroutine(Coroutine* cor);
 	Coroutine* getCoroutine();
+	void setPool(WorkerPool* pool);
+
 
 	int getState();
 
 protected:
 	int getOnEventType();
 
-	//void runThreadWork(MultiThreadWork* work);
+	void runThreadWork(MultiThreadWork* work);
 public:
 	static void handle(VarisEvent* th);
 

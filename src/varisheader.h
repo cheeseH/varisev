@@ -21,6 +21,10 @@ class CoroutineManager;
 class CorSocket;
 struct ActiveHead;
 
-
+class MultiThreadWork;
+class Runnable;
+class Thread;
+class ThreadPool;
+class WorkerPool;
 
 #endif /* VARISHEADER_H_ */

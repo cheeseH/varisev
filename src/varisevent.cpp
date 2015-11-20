@@ -6,7 +6,11 @@
  */
 #include "varisevent.h"
 #include "eventmanager.h"
-VarisEvent::VarisEvent(int fd,int listenEventType):descriptor_(fd),listenEventType_(listenEventType),eventManager_(NULL),/*pool_(NULL),*/onEventType_(0),state_(OUT),pority_(0),cor_(NULL){};
+#include "coroutinemanager.h"
+#include <sys/eventfd.h>
+#include "multithreadwork.h"
+#include "workerpool.h"
+VarisEvent::VarisEvent(int fd,int listenEventType):descriptor_(fd),listenEventType_(listenEventType),eventManager_(NULL),pool_(NULL),onEventType_(0),state_(OUT),pority_(0),cor_(NULL){};
 
 EventManager* VarisEvent::getEventManager(){
 		return eventManager_;
@@ -57,21 +61,26 @@ EventManager* VarisEvent::getEventManager(){
 		listenEventType_ = listenEventType;
 	}
 
-//	void VarisEvent::runThreadWork(MultiThreadWork* work){
+	void VarisEvent::runThreadWork(MultiThreadWork* work){
 //		if(eventManager_->getMultiThread() == 0)
 //			assert(0);
-//		int evfd = eventfd(0,EFD_NONBLOCK);
-//		Event* multi = new CorEvent(evfd,T_READ);
-//		multi->setCoroutine(this->cor_);
-//		eventManager_->Register(multi);
-//		pool_->add(work);
-//		cor_->yield();
-//
-//	}
+		int evfd  = eventfd(0,EFD_NONBLOCK);
+		work->setFd(evfd);
+		CorHelper* helper = new CorHelper(evfd,T_READ,this,eventManager_);
+		pool_->add(work);
+		helper->yield();
+		delete helper;
+		close(evfd);
+
+	}
 	void VarisEvent::handle(VarisEvent* th){
 		th->callback();
 	}
 	void VarisEvent::setManager(EventManager* manager){
 		this->eventManager_ = manager;
+	}
+
+	void VarisEvent::setPool(WorkerPool* pool){
+		pool_ = pool;
 	}
 

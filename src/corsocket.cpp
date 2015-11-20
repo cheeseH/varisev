@@ -41,7 +41,7 @@ int CorSocket::Recv(void* buf,size_t len){
 	CorHelper*  helper = new CorHelper(sockfd_,T_READ,parent_,evManager_);
 	size_t received = 0;
 			while(received < len){
-				int ret = read(sockfd_,buf+received,len);
+				int ret = read(sockfd_,buf+received,len-received);
 				//客户端关闭了网络链接
 				if(ret == 0){
 					delete helper;
@@ -104,7 +104,7 @@ int CorSocket::Send(void* buf,size_t len){
 	CorHelper* helper = new CorHelper(sockfd_,T_READ,parent_,evManager_);
 	int sended = 0;
 	while(sended < len){
-		int ret = write(sockfd_,buf+sended,len);
+		int ret = write(sockfd_,buf+sended,len-sended);
 		//客户端关闭了网络链接
 		if(ret == 0){
 			delete helper;

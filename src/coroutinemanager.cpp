@@ -129,11 +129,11 @@ bool CoroutineManager::doWork(VarisEvent* event){
 			int tmpCoroutine = freeCoroutine_.top();
 			freeCoroutine_.pop();
 			ucontext_t* context = coroutines_[tmpCoroutine].getContext();
-			makecontext(context,(corfunc)(VarisEvent::handle),1,event);
 			context->uc_link = coroutines_[0].getContext();
 			Coroutine* coroutine = &(coroutines_[tmpCoroutine]);
 			coroutine->setStatus(READY);
 			event->setCoroutine(coroutine);
+			makecontext(context,(corfunc)(VarisEvent::handle),1,event);
 			runCoroutine(tmpCoroutine);
 			return true;
 	}
@@ -142,19 +142,23 @@ bool CoroutineManager::doWork(VarisEvent* event){
 
 
 void CorEvent::callback(){
-	std::cout<<"id:"<<cor_->getId()<<std::endl;
+//	std::cout<<"id:"<<cor_->getId()<<std::endl;
+	if(multi_){
+		uint64_t u;
+		read(descriptor_,&u,sizeof(uint64_t));
+	}
 	parent_->setCoroutine(cor_);
 	cor_->work();
 }
 
-CorEvent::CorEvent(int fd,int listenType,VarisEvent* parent):VarisEvent(fd,listenType),parent_(parent){
+CorEvent::CorEvent(int fd,int listenType,VarisEvent* parent,int multi):VarisEvent(fd,listenType),parent_(parent),multi_(multi){
 	cor_ = parent->getCoroutine();
 	listenEventType_|=T_CONTINUE;
 }
 
-CorHelper::CorHelper(int fd,int listenEventType,VarisEvent* event,EventManager* manager):evManager_(manager),cor_(event->getCoroutine()){
+CorHelper::CorHelper(int fd,int listenEventType,VarisEvent* event,EventManager* manager,int multi):evManager_(manager),cor_(event->getCoroutine()){
 	listenEventType|= T_COROUTINE;
-	event_ = new CorEvent(fd,listenEventType,event);
+	event_ = new CorEvent(fd,listenEventType,event,multi);
 	evManager_->Register(event_,-1);
 }
 

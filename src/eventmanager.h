@@ -76,8 +76,8 @@ private:
 	int multiThread_;
 	TimerManager* timeEvents_;
 	Looper* looper_;
-
 	epoll_event* events_;
+	WorkerPool* pool_;
 public:
 	EventManager();
 	void Register(VarisEvent* event,long ltime = -1);
@@ -88,6 +88,7 @@ public:
 	void errorHandle(epoll_event* event);
 	void Start();
 	void setLooper(Looper* looper);
+	void setPool(WorkerPool* pool);
 };
 
 
