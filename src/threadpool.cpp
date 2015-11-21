@@ -7,8 +7,8 @@
 
 
 #include "threadpool.h"
-ThreadPool::WorkerThread::WorkerThread(ConcurrentQueue<Runnable*>* workQueues):workQueue_(workQueues),toStop_(false){};
-ThreadPool::WorkerThread::WorkerThread():workQueue_(NULL),toStop_(false){};
+ThreadPool::WorkerThread::WorkerThread(ConcurrentQueue<Runnable*>* workQueues):toStop_(false),workQueue_(workQueues){};
+ThreadPool::WorkerThread::WorkerThread():toStop_(false),workQueue_(NULL){};
 void ThreadPool::WorkerThread::setQueue(ConcurrentQueue<Runnable*>* workQueues){
 	workQueue_ = workQueues;
 }
@@ -25,6 +25,7 @@ int ThreadPool::WorkerThread::run(){
 
 		};
 		delete target;
+
 	}
 	running_ = false;
 	return ret;
@@ -51,7 +52,7 @@ void ThreadPool::execute(Runnable* target){
 }
 
 void ThreadPool::stop(){
-	for(int i = 0;i<threadCount_;i++){
+	for(size_t i = 0;i<threadCount_;i++){
 		workThreads_[i].close();
 	}
 }

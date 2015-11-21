@@ -10,6 +10,7 @@
 #include <sys/eventfd.h>
 #include "multithreadwork.h"
 #include "workerpool.h"
+#include <iostream>
 VarisEvent::VarisEvent(int fd,int listenEventType):descriptor_(fd),listenEventType_(listenEventType),eventManager_(NULL),pool_(NULL),onEventType_(0),state_(OUT),pority_(0),cor_(NULL){};
 
 EventManager* VarisEvent::getEventManager(){

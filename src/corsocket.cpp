@@ -96,9 +96,6 @@ int CorSocket::Recv(void* buf,size_t len){
 //		return received;
 //}
 
-int CorSocket::InnerSend(void* buf,size_t len){
-
-}
 
 int CorSocket::Send(void* buf,size_t len){
 	CorHelper* helper = new CorHelper(sockfd_,T_READ,parent_,evManager_);

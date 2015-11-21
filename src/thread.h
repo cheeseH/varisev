@@ -22,9 +22,10 @@ public:
 	static void* Tdo(void* thread);
 	int join();
 private:
-	pthread_t id_;
 	Runnable* target_;
 protected:
+	pthread_t id_;
+
 	std::atomic<bool> running_;
 };
 

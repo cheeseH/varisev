@@ -8,7 +8,7 @@
 #include "eventmanager.h"
 #include <iostream>
 typedef void (*corfunc)(void);
-Coroutine::Coroutine(size_t id,size_t stackSize):id_(id),stackSize_(stackSize),status_(FREE){
+Coroutine::Coroutine(size_t id,size_t stackSize):id_(id),stackSize_(stackSize),status_(FREE),cManager_(NULL){
 	stack_ = new char[stackSize_];
 	getcontext(context_);
 }
@@ -86,9 +86,8 @@ void CoroutineManager::onCoroutineFinished(CoroutineManager* th){
 		Coroutine cor = th->coroutines_[th->curCoroutine_];
 		cor.setStatus(FREE);
 		th->freeCoroutine_.push(th->curCoroutine_);
-		th->lastCoroutine_ = 0;
-		th->curCoroutine_ = 1;
-		th->runCoroutine(th->curCoroutine_);
+		th->curCoroutine_ = 0;
+		th->runCoroutine(1);
 	}
 }
 void CoroutineManager::schedule(size_t workerNumber){
@@ -137,6 +136,7 @@ bool CoroutineManager::doWork(VarisEvent* event){
 			runCoroutine(tmpCoroutine);
 			return true;
 	}
+	return false;
 
 }
 

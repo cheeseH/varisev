@@ -22,54 +22,54 @@
 #include <sys/time.h>
 
 
-class EchoEvent:public VarisEvent{
-public:
-	EchoEvent(int fd,int onListenType):VarisEvent(fd,onListenType){
-
-	}
-	void callback(){
-		char* str = "hello varisev";
-		write(descriptor_,(void*)str,13);
-	}
-};
-class AcceptEvent:public VarisEvent{
-public:
-	void callback(){
-		int acceptfd = accept(descriptor_,(sockaddr*)&clientaddr,&clilen);
-		 if(acceptfd<0){
-			 perror("acceptfd<0");
-             return;
-	     }
-		 int opts;
-		 opts=fcntl(acceptfd,F_GETFL);
-		 if(opts<0)
-		 {
-			 perror("fcntl(sock,GETFL)");
-	         return;
-		 }
-		 opts = opts|O_NONBLOCK;
-		 if(fcntl(acceptfd,F_SETFL,opts)<0)
-		 {
-			 perror("fcntl(sock,SETFL,opts)");
-		     return;
-		 }
-		 CorSocket* corSock = new CorSocket(acceptfd,eventManager_,this);
-		 char* buffer = new char[4];
-		 while(true){
-			 corSock->Recv(buffer,4);
-			 corSock->Send(buffer,4);
-//			 char* line = new char[1];
-//			 line[0] = '\n';
-//			 corSock->Send(line,1);
-		 }
-	}
-	AcceptEvent(int fd,int listenType):VarisEvent(fd,listenType),clientaddr(),clilen(){
-
-	}
-private:
-	sockaddr_in clientaddr;
-	socklen_t clilen;
-};
+//class EchoEvent:public VarisEvent{
+//public:
+//	EchoEvent(int fd,int onListenType):VarisEvent(fd,onListenType){
+//
+//	}
+//	void callback(){
+//		char* str = "hello varisev";
+//		write(descriptor_,(void*)str,13);
+//	}
+//};
+//class AcceptEvent:public VarisEvent{
+//public:
+//	void callback(){
+//		int acceptfd = accept(descriptor_,(sockaddr*)&clientaddr,&clilen);
+//		 if(acceptfd<0){
+//			 perror("acceptfd<0");
+//             return;
+//	     }
+//		 int opts;
+//		 opts=fcntl(acceptfd,F_GETFL);
+//		 if(opts<0)
+//		 {
+//			 perror("fcntl(sock,GETFL)");
+//	         return;
+//		 }
+//		 opts = opts|O_NONBLOCK;
+//		 if(fcntl(acceptfd,F_SETFL,opts)<0)
+//		 {
+//			 perror("fcntl(sock,SETFL,opts)");
+//		     return;
+//		 }
+//		 CorSocket* corSock = new CorSocket(acceptfd,eventManager_,this);
+//		 char* buffer = new char[4];
+//		 while(true){
+//			 corSock->Recv(buffer,4);
+//			 corSock->Send(buffer,4);
+////			 char* line = new char[1];
+////			 line[0] = '\n';
+////			 corSock->Send(line,1);
+//		 }
+//	}
+//	AcceptEvent(int fd,int listenType):VarisEvent(fd,listenType),clientaddr(),clilen(){
+//
+//	}
+//private:
+//	sockaddr_in clientaddr;
+//	socklen_t clilen;
+//};
 
 class FileReadWork:public MultiThreadWork{
 public:
@@ -99,8 +99,8 @@ public:
 }
 private:
 	int fd_;
-	char* buf_;
 	int buflen_;
+	char* buf_;
 	int* len_;
 };
 

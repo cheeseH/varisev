@@ -14,7 +14,7 @@
 #include <atomic>
 #include <mutex>
 #include <thread>
-
+#include <iostream>
 
 template <typename T>
 class ConcurrentQueue
@@ -80,7 +80,7 @@ void ConcurrentQueue<T>::pop(T& data)
 		}
 		--popWaitCount;
 	} while(!claimg.compare_exchange_weak(cg, i2p(cg + 1)));
-
+	std::cout<<"after pop:"<<claimg.load()<<std::endl;
 	data = buffer[cg];
 
 	size_t oh = cg, nh = i2p(cg + 1);
@@ -108,8 +108,9 @@ void ConcurrentQueue<T>::push(const T& data)
 		++pushWaitCount;
 		while(i2p((cp = claimp.load()) + 1) == (h = head.load()))
 		{
+				std::cout<<"dead1"<<std::endl;
 				std::unique_lock<std::mutex> lck(fmtx);
-			waitForFll.wait(lck);
+				waitForFll.wait(lck);
 		}
 		--pushWaitCount;
 	} while(!claimp.compare_exchange_weak(cp, i2p(cp + 1)));
@@ -124,7 +125,7 @@ void ConcurrentQueue<T>::push(const T& data)
 	}
 
 	size_t odwc = popWaitCount.load();
-	while(odwc > 0 && odwc <= popWaitCount.load() && !isFull())
+	if(odwc > 0 && odwc <= popWaitCount.load() && !isFull())
 	{
 		odwc = popWaitCount.load();
 		waitForEpt.notify_all();

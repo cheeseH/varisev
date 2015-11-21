@@ -36,7 +36,6 @@ public:
 	int Send(void* buf,size_t len);
 	virtual ~CorSocket();
 private:
-	int InnerRecv(void* buf,size_t len);
 	int InnerSend(void* buf,size_t len);
 };
 
